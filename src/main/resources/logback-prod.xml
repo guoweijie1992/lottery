@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--60秒检查一次配置文件是否有修改，即时生效-->
+<configuration scan="false" scanPeriod="60 seconds" debug="false">
+
+    <!-- 按照每天生成日志文件 -->
+    <appender name="rollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/talentcode.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>./logs/talentcode.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>1024MB</maxFileSize>
+            <maxHistory>180</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level -- [%thread]  %-35logger{40} : %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <logger name="com.hzsmk.talentcode.dao" level="DEBUG" />
+    <logger name="com.hzsmk.talentcode.smkdao" level="DEBUG" />
+    <logger name="com.hzsmk.talentcode.cardao" level="DEBUG" />
+    <root>
+        <level value="info"/>
+        <appender-ref ref="rollingFileAppender"/>
+    </root>
+</configuration>

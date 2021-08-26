@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--60秒检查一次配置文件是否有修改，即时生效(已关闭)-->
+<configuration scan="false" scanPeriod="60 seconds" debug="false">
+
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}  %-5level -- [%thread]  %-35logger{40} : %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 按照每天生成日志文件 -->
+    <appender name="rollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/talentcode.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>./logs/talentcode.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>5</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level -- [%thread]  %-35logger{40} : %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    <logger name="com.hzsmk.talentcode.dao" level="DEBUG" />
+    <logger name="com.hzsmk.talentcode.smkdao" level="DEBUG" />
+    <logger name="com.hzsmk.talentcode.cardao" level="DEBUG" />
+
+    <root>
+        <level value="info"/>
+        <appender-ref ref="rollingFileAppender"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

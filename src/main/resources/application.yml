@@ -1,0 +1,55 @@
+# 开发数据库
+spring:
+  datasource:
+    base:
+      jdbcUrl: jdbc:mysql://192.168.23.212:3306/smk_lottery?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
+      username: root
+      password: 123456
+  #quartz配置
+  quartz:
+    #相关属性配置
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: clusteredScheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: true
+            clusterCheckinInterval: 10000
+            useProperties: false
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+    #数据库方式
+    job-store-type: jdbc
+    #初始化表结构
+    jdbc:
+      initialize-schema: ALWAYS
+    overwrite-existing-jobs: true
+
+---
+# 测试数据库
+spring:
+  profiles: test
+  datasource:
+    base:
+      jdbcUrl: jdbc:mysql://192.168.23.212:3306/smk_lottery?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
+      username: root
+      password: 123456
+
+
+---
+# 生产数据库
+spring:
+  profiles: prod
+  datasource:
+    base:
+      jdbcUrl: jdbc:mysql://10.101.244.70:3306/smk_lottery?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
+      username: smk_hzrck
+      password: smk_hzrck96225#
