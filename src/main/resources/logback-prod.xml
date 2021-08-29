@@ -4,10 +4,10 @@
 
     <!-- 按照每天生成日志文件 -->
     <appender name="rollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/talentcode.log</file>
+        <file>./logs/lottery.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>./logs/talentcode.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>./logs/lottery.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <maxFileSize>1024MB</maxFileSize>
             <maxHistory>180</maxHistory>
             <totalSizeCap>10GB</totalSizeCap>
@@ -18,9 +18,9 @@
         </encoder>
     </appender>
 
-    <logger name="com.hzsmk.talentcode.dao" level="DEBUG" />
-    <logger name="com.hzsmk.talentcode.smkdao" level="DEBUG" />
-    <logger name="com.hzsmk.talentcode.cardao" level="DEBUG" />
+    <logger name="com.hzsmk.lottery.dao" level="DEBUG" />
+    <logger name="com.hzsmk.lottery.smkdao" level="DEBUG" />
+    <logger name="com.hzsmk.lottery.cardao" level="DEBUG" />
     <root>
         <level value="info"/>
         <appender-ref ref="rollingFileAppender"/>

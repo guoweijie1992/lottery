@@ -29,7 +29,7 @@ import java.util.Properties;
  * @author jiangjiaheng
  */
 @Configuration
-@MapperScan(basePackages = "com.hzsmk.talentcode.dao", sqlSessionTemplateRef = Consts.PRIMARY_SQLSESSION_TEMPLATE)
+@MapperScan(basePackages = "com.hzsmk.lottery.dao", sqlSessionTemplateRef = Consts.PRIMARY_SQLSESSION_TEMPLATE)
 public class DataSourceConfig {
 
     /**

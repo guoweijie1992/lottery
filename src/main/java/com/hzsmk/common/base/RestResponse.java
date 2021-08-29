@@ -4,6 +4,7 @@ package com.hzsmk.common.base;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -17,6 +18,7 @@ public class RestResponse implements Serializable {
     private String code;
     private String msg;
     private Object response;
+    private Date systemDate=new Date();
 
     public RestResponse() {
     }
@@ -40,6 +42,7 @@ public class RestResponse implements Serializable {
      */
     public static RestResponse successResult(Object data) {
         RestResponse result = new RestResponse();
+        result.setSystemDate(new Date());
         result.setCode(ApiConsts.SUCCESS_CODE);
         result.setMsg(ApiConsts.SUCCESS_DESC);
         if (Objects.nonNull(data)) {
@@ -61,6 +64,7 @@ public class RestResponse implements Serializable {
         result.setCode(respCode);
         result.setResponse(null);
         result.setMsg(respDesc);
+        result.setSystemDate(new Date());
         return result;
     }
 
