@@ -6,3 +6,123 @@ springboot + mysql + mybatisplus
 /home/smkapp/tomcat/lottery
 
 测试数据库：192.168.23.212:3306/smk_lottery   root 123456
+
+CREATE TABLE `lottery_act_code` (
+  `id` bigint(20) NOT NULL COMMENT '主键id',
+  `act_id` bigint(20) NOT NULL COMMENT '活动主键id',
+  `user_id` varchar(32) NOT NULL COMMENT '用户id',
+  `mobile` varchar(20) NOT NULL COMMENT '手机号',
+  `lottery_code` varchar(20) NOT NULL COMMENT '券码',
+  `lottery_status` varchar(20) DEFAULT NULL COMMENT '开奖状态 unplayed 未开始/playing 进行中/awaiting 待开奖/completed 已开奖',
+  `prize_status` varchar(10) DEFAULT NULL COMMENT '中奖状态 win已中奖 lose未中奖',
+  `prize_id` bigint(20) DEFAULT NULL COMMENT '奖品主键id',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `if_delete` int(2) DEFAULT '0' COMMENT '是否删除 0未删除 1已删除 默认0',
+  `if_notice` int(2) DEFAULT NULL COMMENT '是否已提示 0未提示 1已提示',
+  `code_type` int(2) NOT NULL COMMENT '券码类型  0自抽  1助力',
+  `if_first_join` int(2) NOT NULL COMMENT '是否首次参加 0 非首次 1首次',
+  `sync_status` int(2) DEFAULT NULL COMMENT '同步优惠券系统状态  00未同步 01已同步',
+  `sync_counts` int(2) DEFAULT NULL COMMENT '同步次数  超过5次不再同步',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `act_id` (`act_id`) USING BTREE,
+  KEY `user_id` (`user_id`) USING BTREE,
+  KEY `mobile` (`mobile`) USING BTREE,
+  KEY `prize_id` (`prize_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+
+
+
+CREATE TABLE `lottery_act_prize` (
+  `id` bigint(20) NOT NULL COMMENT '主键id',
+  `act_id` bigint(20) NOT NULL COMMENT '活动表主键id',
+  `prize_id` bigint(20) DEFAULT NULL COMMENT '奖品表主键id',
+  `prize_level_desc` varchar(64) DEFAULT NULL COMMENT '奖品等级描述',
+  `prize_number` int(8) DEFAULT NULL COMMENT '奖品数量',
+  `use_url` varchar(255) DEFAULT NULL COMMENT '使用链接',
+  `coupon_number` varchar(255) DEFAULT NULL COMMENT '优惠券编号',
+  `sort` int(3) DEFAULT NULL COMMENT '奖品优先级',
+  `status` varchar(30) NOT NULL COMMENT '奖品状态  0不可用 1可用 ',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `if_delete` int(2) DEFAULT '0' COMMENT '是否删除 0未删除 1已删除 默认0',
+  `description` varchar(64) DEFAULT NULL COMMENT '活动奖品描述，我的奖品页面展示',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `act_id` (`act_id`) USING BTREE,
+  KEY `prize_id` (`prize_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE `lottery_activity` (
+  `id` bigint(20) NOT NULL COMMENT '主键id',
+  `lottery_name` varchar(30) NOT NULL COMMENT '活动名称',
+  `start_time` datetime NOT NULL COMMENT '活动开始时间',
+  `end_time` datetime NOT NULL COMMENT '活动结束时间',
+  `draw_time` datetime NOT NULL COMMENT '开奖时间',
+  `status` varchar(30) NOT NULL COMMENT '活动状态  0不可用 1可用 ',
+  `lottery_status` varchar(64) DEFAULT 'unplayed' COMMENT '开奖状态 unplayed 未开始/playing 进行中/awaiting 待开奖/completed 已开奖',
+  `max_be_help` int(2) NOT NULL COMMENT '最大被助力次数',
+  `max_help` int(2) NOT NULL COMMENT '最大为他人助力次数',
+  `act_rule` varchar(2000) DEFAULT NULL COMMENT '活动规则链接',
+  `tips` varchar(64) DEFAULT NULL COMMENT '抽奖码页面提示',
+  `description` varchar(64) DEFAULT NULL COMMENT '活动描述',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `if_delete` int(2) DEFAULT '0' COMMENT '是否删除 0未删除 1已删除 默认0',
+  `title` varchar(64) NOT NULL COMMENT '主标题',
+  `sub_title` varchar(64) DEFAULT NULL COMMENT '子标题',
+  `draw_counts` int(2) DEFAULT NULL COMMENT '抽奖次数',
+  `draw_frequency` varchar(20) DEFAULT NULL COMMENT '抽奖频次  day 天/week 星期 /around 次',
+  `share_img_url` varchar(255) DEFAULT NULL COMMENT '分享页背景图',
+  `bg_img_url` varchar(255) DEFAULT NULL COMMENT '背景图片',
+  `unplayed_img_url` varchar(255) DEFAULT NULL COMMENT '未开始图片',
+  `playing_img_url` varchar(255) DEFAULT NULL COMMENT '进行中图片',
+  `awaiting_img_url` varchar(255) DEFAULT NULL COMMENT '待开奖图片',
+  `completed_img_url` varchar(255) DEFAULT NULL COMMENT '已结束图片',
+  `btn_img_url` varchar(255) DEFAULT NULL COMMENT '按钮图片',
+  `business_id` varchar(64) DEFAULT NULL COMMENT '埋点id',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `lottery_name` (`lottery_name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE `lottery_black_list` (
+  `id` bigint(20) NOT NULL COMMENT '主键id',
+  `user_id` varchar(32) NOT NULL COMMENT '用户id',
+  `mobile` varchar(11) NOT NULL COMMENT '手机号',
+  `status` int(2) NOT NULL COMMENT '参与活动状态  0不可参与 1可参与',
+  `act_id` bigint(20) NOT NULL COMMENT '活动id',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `user_id` (`user_id`) USING BTREE,
+  KEY `mobile` (`mobile`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+
+CREATE TABLE `lottery_help_record` (
+  `id` bigint(20) NOT NULL COMMENT '主键id',
+  `help_user_id` varchar(32) NOT NULL COMMENT '用户id',
+  `help_mobile` varchar(11) NOT NULL COMMENT '手机号',
+  `help_user_img` varchar(255) NOT NULL COMMENT '手机号',
+  `code_id` bigint(20) NOT NULL COMMENT '卷码表id',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `code_id` (`code_id`) USING BTREE,
+  KEY `help_user_id` (`help_user_id`) USING BTREE,
+  KEY `help_mobile` (`help_mobile`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='助力记录表';
+
+CREATE TABLE `lottery_prize` (
+  `id` bigint(20) NOT NULL COMMENT '主键id',
+  `prize_name` varchar(30) NOT NULL COMMENT '奖品名称',
+  `prize_price` int(8) DEFAULT NULL COMMENT '奖品价格',
+  `img_url` varchar(255) DEFAULT NULL COMMENT '奖品图片',
+  `status` varchar(30) NOT NULL COMMENT '奖品状态  0不可用 1可用 ',
+  `description` varchar(64) DEFAULT NULL COMMENT '奖品描述',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `if_delete` int(2) DEFAULT '0' COMMENT '是否删除 0未删除 1已删除 默认0',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `prize_name` (`prize_name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+
+
