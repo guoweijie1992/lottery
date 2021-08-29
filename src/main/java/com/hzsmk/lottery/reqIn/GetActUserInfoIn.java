@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
  * @Description:
  */
 @Data
-public class GetActInfoIn {
+public class GetActUserInfoIn {
 
     @NotEmpty(message = "活动id不能为空")
     private  Long actId;
