@@ -29,7 +29,7 @@ CREATE TABLE `lottery_act_code` (
   KEY `user_id` (`user_id`) USING BTREE,
   KEY `mobile` (`mobile`) USING BTREE,
   KEY `prize_id` (`prize_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='券码表';
 
 
 
@@ -50,7 +50,7 @@ CREATE TABLE `lottery_act_prize` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `act_id` (`act_id`) USING BTREE,
   KEY `prize_id` (`prize_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='活动奖品关联表';
 
 CREATE TABLE `lottery_activity` (
   `id` bigint(20) NOT NULL COMMENT '主键id',
@@ -82,7 +82,7 @@ CREATE TABLE `lottery_activity` (
   `business_id` varchar(64) DEFAULT NULL COMMENT '埋点id',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `lottery_name` (`lottery_name`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='活动表';
 
 CREATE TABLE `lottery_black_list` (
   `id` bigint(20) NOT NULL COMMENT '主键id',
@@ -95,7 +95,7 @@ CREATE TABLE `lottery_black_list` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `user_id` (`user_id`) USING BTREE,
   KEY `mobile` (`mobile`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='黑名单';
 
 CREATE TABLE `lottery_help_record` (
   `id` bigint(20) NOT NULL COMMENT '主键id',
@@ -123,6 +123,6 @@ CREATE TABLE `lottery_prize` (
   `if_delete` int(2) DEFAULT '0' COMMENT '是否删除 0未删除 1已删除 默认0',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `prize_name` (`prize_name`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='奖品表';
 
 
