@@ -85,4 +85,16 @@ public class LotteryActCodeEntity implements Serializable {
 	 */
 	private Integer syncCounts;
 
+	public LotteryActCodeEntity(Long actId, String userId, String mobile, String lotteryCode, String lotteryStatus, Date createTime,
+								Integer ifDelete, Integer codeType, Integer ifFirstJoin) {
+		this.actId = actId;
+		this.userId = userId;
+		this.mobile = mobile;
+		this.lotteryCode = lotteryCode;
+		this.lotteryStatus = lotteryStatus;
+		this.createTime = createTime;
+		this.ifDelete = ifDelete;
+		this.codeType = codeType;
+		this.ifFirstJoin = ifFirstJoin;
+	}
 }

@@ -3,6 +3,7 @@ package com.hzsmk.lottery.controller;
 import com.hzsmk.common.base.RestResponse;
 import com.hzsmk.lottery.reqIn.GetActInfoIn;
 import com.hzsmk.lottery.reqIn.GetActUserInfoIn;
+import com.hzsmk.lottery.reqIn.GetCodeIn;
 import com.hzsmk.lottery.service.LotteryService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +37,16 @@ public class LotteryController {
     @RequestMapping("lottery/actUserInfo")
     public RestResponse getActUserInfo(@RequestBody GetActUserInfoIn param){
         return lotteryService.getActUserInfo(param);
+    }
+
+
+    /**
+     * 立即抽奖获取券码
+     * @param param
+     * @return
+     */
+    @RequestMapping("lottery/getCode")
+    public RestResponse getCode(@RequestBody GetCodeIn param){
+        return lotteryService.getCode(param);
     }
 }
