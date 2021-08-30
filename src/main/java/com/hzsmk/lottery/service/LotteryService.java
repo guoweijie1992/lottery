@@ -13,5 +13,5 @@ import com.hzsmk.lottery.reqIn.GetActUserInfoIn;
 public interface LotteryService {
     RestResponse getActInfo(GetActInfoIn param);
 
-    RestResponse actUserInfo(GetActUserInfoIn param);
+    RestResponse getActUserInfo(GetActUserInfoIn param);
 }

@@ -35,11 +35,11 @@ public class LotteryActPrizeEntity implements Serializable {
 	/**
 	 * 奖品等级描述
 	 */
-	private String prizeLevelDesc;
+	private String levelDesc;
 	/**
 	 * 奖品数量
 	 */
-	private Integer prizeNumber;
+	private Integer amount;
 	/**
 	 * 使用链接
 	 */

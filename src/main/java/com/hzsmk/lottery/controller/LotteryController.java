@@ -24,7 +24,7 @@ public class LotteryController {
      * @return
      */
     @RequestMapping("lottery/getActInfo")
-    public RestResponse getLotteryInfo(@RequestBody GetActInfoIn param){
+    public RestResponse getActInfo(@RequestBody GetActInfoIn param){
         return lotteryService.getActInfo(param);
     }
 
@@ -34,7 +34,7 @@ public class LotteryController {
      * @return
      */
     @RequestMapping("lottery/actUserInfo")
-    public RestResponse getLottery(@RequestBody GetActUserInfoIn param){
-        return lotteryService.actUserInfo(param);
+    public RestResponse getActUserInfo(@RequestBody GetActUserInfoIn param){
+        return lotteryService.getActUserInfo(param);
     }
 }

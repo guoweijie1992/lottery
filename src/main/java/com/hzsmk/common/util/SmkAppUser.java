@@ -32,4 +32,8 @@ public class SmkAppUser implements Serializable {
      * 手机号
      */
     private String mobile;
+    /**
+     * 用户等级
+     */
+    private String level;
 }

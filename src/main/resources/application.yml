@@ -2,7 +2,7 @@
 spring:
   datasource:
     base:
-      jdbcUrl: jdbc:mysql://127.0.0.1:3306/smk_lottery?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
+      jdbcUrl: jdbc:mysql://192.168.23.212:3306/smk_lottery?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
       username: root
       password: 123456
   #quartz配置

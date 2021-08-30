@@ -14,4 +14,8 @@ public class GetActUserInfoIn {
 
     @NotEmpty(message = "活动id不能为空")
     private  Long actId;
+
+    @NotEmpty(message = "accessToken不能为空")
+    private  String accessToken;
 }
+

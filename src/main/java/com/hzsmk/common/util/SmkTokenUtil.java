@@ -94,6 +94,7 @@ public class SmkTokenUtil {
                 user.setName((String) response.get("name"));
                 user.setIdCard((String) response.get("idCard"));
                 user.setUserId((String) response.get("userId"));
+                user.setLevel((String) response.get("lev"));
                 String idcard = user.getIdCard();
                 if (StringUtils.isNotBlank(idcard)) {
                     user.setIdCard(idcard.toLowerCase());
