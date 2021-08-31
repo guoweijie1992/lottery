@@ -21,6 +21,8 @@ import com.hzsmk.lottery.entity.LotteryHelpRecordEntity;
 import com.hzsmk.lottery.entity.eo.Prize;
 import com.hzsmk.lottery.req.in.*;
 import com.hzsmk.lottery.req.out.GetActInfoOut;
+import com.hzsmk.lottery.req.out.GetMyPrizeAct;
+import com.hzsmk.lottery.req.out.GetMyPrizeOut;
 import com.hzsmk.lottery.service.LotteryService;
 import com.hzsmk.lottery.service.thrid.SmkUserSystem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotEmpty;
 import java.util.*;
 
 /**
@@ -54,12 +57,12 @@ public class LotteryServiceImpl implements LotteryService {
 
     @Override
     public RestResponse getActInfo(GetActInfoIn param) {
-        LotteryActivityEntity act= (LotteryActivityEntity) checkActStatus(param.getActId()).getResponse();
+        LotteryActivityEntity act = (LotteryActivityEntity) checkActStatus(param.getActId()).getResponse();
         //3.获取活动对应奖品
         List<Prize> prizes = actPrizeDao.selectPrizeByActId(act.getId());
         //4.组装返回参数
         GetActInfoOut getActInfoOut = new GetActInfoOut();
-        BeanUtil.copyProperties(act,getActInfoOut);
+        BeanUtil.copyProperties(act, getActInfoOut);
         getActInfoOut.setPrizeList(prizes);
         return RestResponse.successResult(getActInfoOut);
     }
@@ -96,9 +99,10 @@ public class LotteryServiceImpl implements LotteryService {
         if (ObjectUtil.isNull(appUser)) {
             return RestResponse.errorBusinessResult("token解析失败");
         }
-        //根据活动id查询code列表
+        //2.根据活动id查询code列表
         List<LotteryActCodeEntity> codeList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
-                .eq(LotteryActCodeEntity::getActId, param.getActId()));
+                .eq(LotteryActCodeEntity::getActId, param.getActId())
+                .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N));
         List<String> actCodeList = new LinkedList<>();
         if (ObjectUtil.isEmpty(codeList)) {
             ret.put("attendStatus", "unjoin");
@@ -117,7 +121,7 @@ public class LotteryServiceImpl implements LotteryService {
 
     @Override
     public RestResponse getCode(GetCodeIn param) {
-        Map ret=new HashMap<>();
+        Map ret = new HashMap<>();
         /**
          * 1.判断活动状态
          * 2.判断用户是否可参与
@@ -141,7 +145,7 @@ public class LotteryServiceImpl implements LotteryService {
                 lotteryCode, LotteryConsts.LOTTERY_STATUS_PLAYING, new Date(), LotteryConsts.IFDELETE_N, LotteryConsts.CODETYPE_SELF, ifFirst);
         int insert = actCodeDao.insert(entity);
         if (insert > 0) {
-            ret.put("lotteryCode",lotteryCode);
+            ret.put("lotteryCode", lotteryCode);
             return RestResponse.successResult(ret);
         } else {
             throw new BusinessException("数据库保存失败");
@@ -150,12 +154,13 @@ public class LotteryServiceImpl implements LotteryService {
 
     /**
      * 获取助力页面详情
+     *
      * @param param
      * @return
      */
     @Override
     public RestResponse getHelpInfo(GetHelpInfoIn param) {
-        Map ret=new HashMap();
+        Map ret = new HashMap();
         //被助力手机号
         String mobile = param.getMobile();
         //获取被助力用户userId
@@ -169,25 +174,26 @@ public class LotteryServiceImpl implements LotteryService {
         }
         //组装返回数据
         LotteryActivityEntity act = (LotteryActivityEntity) restResponse.getResponse();
-        ret.put("mobile", mobile.substring(0,3)+"****"+mobile.substring(7,11));
-        ret.put("lotteryName",act.getLotteryName());
-        ret.put("endTime",act.getEndTime());
-        ret.put("lotteryStatus",act.getLotteryStatus());
-        ret.put("shareImgUrl",act.getShareImgUrl());
-        ret.put("headImgUrl",userInfo.get("headImageUrl"));
+        ret.put("mobile", mobile.substring(0, 3) + "****" + mobile.substring(7, 11));
+        ret.put("lotteryName", act.getLotteryName());
+        ret.put("endTime", act.getEndTime());
+        ret.put("lotteryStatus", act.getLotteryStatus());
+        ret.put("shareImgUrl", act.getShareImgUrl());
+        ret.put("headImgUrl", userInfo.get("headImageUrl"));
         //返回前端
         return RestResponse.successResult(ret);
     }
 
     /**
      * 助力获取奖券
+     *
      * @param param
      * @return
      */
     @Override
     @Transactional
     public RestResponse help(HelpIn param) {
-        Map ret=new HashMap();
+        Map ret = new HashMap();
         //1.获取活动并判断活动状态是否可参与
         RestResponse restResponse = checkActStatus(param.getActId());
         if (!ApiConsts.SUCCESS_CODE.equals(restResponse.getCode())) {
@@ -202,21 +208,21 @@ public class LotteryServiceImpl implements LotteryService {
         String userId = smkUserSystem.getUserIdByMobile(mobile);
         //获取助力用户信息
         SmkAppUser appUser = smkTokenUtil.getAppUser(accessToken);
-        checkHelpStatus(act,appUser,userId);
+        checkHelpStatus(act, appUser, userId);
         //3.生成奖券，保存数据库
         //todo  lotteryCode生成策略
         String lotteryCode = RandomUtil.randomString(8);
         //判断是否首次参加活动
         Integer ifFirst = ifFirstJoin(userId);
-        LotteryActCodeEntity entity = new LotteryActCodeEntity(act.getId(),userId, mobile,
+        LotteryActCodeEntity entity = new LotteryActCodeEntity(act.getId(), userId, mobile,
                 lotteryCode, LotteryConsts.LOTTERY_STATUS_PLAYING, new Date(), LotteryConsts.IFDELETE_N, LotteryConsts.CODETYPE_HELP, ifFirst);
         int insert = actCodeDao.insert(entity);
         if (insert > 0) {
-            ret.put("lotteryCode",lotteryCode);
+            ret.put("lotteryCode", lotteryCode);
         } else {
             throw new BusinessException("数据库保存失败");
         }
-        LotteryHelpRecordEntity helpRecordEntity=new LotteryHelpRecordEntity(appUser.getUserId(),appUser.getMobile(),null,entity.getId(),new Date(),act.getId());
+        LotteryHelpRecordEntity helpRecordEntity = new LotteryHelpRecordEntity(appUser.getUserId(), appUser.getMobile(), null, entity.getId(), new Date(), act.getId());
         int insert1 = helpRecordDao.insert(helpRecordEntity);
         if (insert1 > 0) {
             return RestResponse.successResult(ret);
@@ -228,10 +234,74 @@ public class LotteryServiceImpl implements LotteryService {
     }
 
     /**
+     * 获取我的奖品
+     *
+     * @param param
+     * @return
+     */
+    @Override
+    public RestResponse getMyPrize(GetMyPrizeIn param) {
+        GetMyPrizeOut getMyPrizeOut = new GetMyPrizeOut();
+        String accessToken = param.getAccessToken();
+        SmkAppUser appUser = smkTokenUtil.getAppUser(accessToken);
+        String userId = appUser.getUserId();
+        //待开奖的
+        if (LotteryConsts.PRIZE_TYPE_AWAITING.equals(param.getType())) {
+            List<GetMyPrizeAct> awaitingList = new ArrayList<>();
+            //获取当前用户参与的进行中或待开奖的活动
+            List<String> lotteryStatus = new LinkedList<String>() {{
+                add(LotteryConsts.LOTTERY_STATUS_AWAITING);
+                add(LotteryConsts.LOTTERY_STATUS_PLAYING);
+            }};
+            List<LotteryActivityEntity> list = activityDao.selectActByUserId(userId, lotteryStatus);
+            //循环获取活动的券码
+            for (LotteryActivityEntity lotteryActivityEntity : list) {
+                GetMyPrizeAct getMyPrizeAct = new GetMyPrizeAct();
+                List<LotteryActCodeEntity> codeList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
+                        .eq(LotteryActCodeEntity::getActId, lotteryActivityEntity.getId())
+                        .eq(LotteryActCodeEntity::getUserId,userId)
+                        .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N));
+                //若有记录返回code列表
+                List<String> actCodeList = new LinkedList<>();
+                //将券码存到列表中
+                for (LotteryActCodeEntity entity : codeList) {
+                    actCodeList.add(entity.getLotteryCode());
+                }
+                List<Prize> prizes = actPrizeDao.selectPrizeByActId(lotteryActivityEntity.getId());
+                //组装返回参数
+                BeanUtil.copyProperties(lotteryActivityEntity, getMyPrizeAct);
+                getMyPrizeAct.setLotteryId(lotteryActivityEntity.getId());
+                getMyPrizeAct.setActCodeList(actCodeList);
+                getMyPrizeAct.setImgUrl(prizes.get(0).getImgUrl());
+                awaitingList.add(getMyPrizeAct);
+            }
+            getMyPrizeOut.setAwaitingList(awaitingList);
+        }
+        //已完成的
+        if (LotteryConsts.PRIZE_TYPE_COMPLETED.equals(param.getType())) {
+            List<GetMyPrizeAct> completedList = new ArrayList<>();
+            //获取当前用户参与的已完成的活动
+            List<String> lotteryStatus = new LinkedList<String>() {{
+                add(LotteryConsts.LOTTERY_STATUS_COMPLETED);
+            }};
+            List<LotteryActivityEntity> list = activityDao.selectActByUserId(userId, lotteryStatus);
+            //循环活动列表，判断用户是否中奖
+            for (LotteryActivityEntity lotteryActivityEntity : list) {
+                //todo 还没做完
+                GetMyPrizeAct getMyPrizeAct = new GetMyPrizeAct();
+                completedList.add(getMyPrizeAct);
+            }
+            getMyPrizeOut.setCompletedList(completedList);
+        }
+        return RestResponse.successResult(getMyPrizeOut);
+    }
+
+    /**
      * 判断助力状态
-     * @param act  活动
+     *
+     * @param act     活动
      * @param appUser 助力用户
-     * @param userId 被助力用户ID
+     * @param userId  被助力用户ID
      */
     private void checkHelpStatus(LotteryActivityEntity act, SmkAppUser appUser, String userId) {
         //设定的最大奖券数量
@@ -245,23 +315,22 @@ public class LotteryServiceImpl implements LotteryService {
                 .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N)
         );
         //若为空则直接返回
-        if(ObjectUtil.isEmpty(entityList)){
+        if (ObjectUtil.isEmpty(entityList)) {
             return;
         }
         //判断是否已达到最大奖券数量
-        if(entityList.size()>=maxCodeCounts){
+        if (entityList.size() >= maxCodeCounts) {
             throw new BusinessException("奖券数量已达到上限");
         }
         //设定的可被助力数量
         Integer maxBeHelp = act.getMaxBeHelp();
         long count = entityList.stream().filter(p -> p.getCodeType().equals(LotteryConsts.CODETYPE_HELP)).count();
-        if(count>=maxBeHelp){
+        if (count >= maxBeHelp) {
             throw new BusinessException("助力奖券数量已达上限");
         }
         //设定的单人助力数量
         Integer maxHelp = act.getMaxHelp();
         //获取助力用户助力的奖券总数量
-
 
 
     }
@@ -292,7 +361,7 @@ public class LotteryServiceImpl implements LotteryService {
      */
     private Integer ifFirstJoin(String userId) {
         List<LotteryActCodeEntity> entityList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
-                .eq(LotteryActCodeEntity::getUserId,userId)
+                .eq(LotteryActCodeEntity::getUserId, userId)
                 .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N));
         if (ObjectUtil.isEmpty(entityList)) {
             return LotteryConsts.FIRST_JOIN_Y;
@@ -326,11 +395,11 @@ public class LotteryServiceImpl implements LotteryService {
                 .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N)
         );
         //若为空则直接返回
-        if(ObjectUtil.isEmpty(entityList)){
+        if (ObjectUtil.isEmpty(entityList)) {
             return;
         }
         //判断是否已达到最大奖券数量
-        if(entityList.size()>=maxCodeCounts){
+        if (entityList.size() >= maxCodeCounts) {
             throw new BusinessException("奖券数量已达到上限");
         }
         if (LotteryConsts.DRAWFREQUENCY_DAY.equals(drawFrequency)) {

@@ -53,14 +53,16 @@ public final class LotteryConsts {
 
 
     /**
-     * 是否删除 否
+     * 是否删除 0 否 1 是
      */
     public static final Integer IFDELETE_N=0;
+    public static final Integer IFDELETE_Y=1;
 
     /**
-     * 是否删除 是
+     * 是否删除 0 否 1 是
      */
-    public static final Integer IFDELETE_Y=1;
+    public static final String PRIZE_TYPE_AWAITING="awaiting";
+    public static final String PRIZE_TYPE_COMPLETED="completed";
 
 
 }

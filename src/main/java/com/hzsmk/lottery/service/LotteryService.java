@@ -19,4 +19,6 @@ public interface LotteryService {
     RestResponse getHelpInfo(GetHelpInfoIn param);
 
     RestResponse help(HelpIn param);
+
+    RestResponse getMyPrize(GetMyPrizeIn param);
 }
