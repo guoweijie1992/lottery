@@ -31,7 +31,7 @@ public class LotteryPrizeEntity implements Serializable {
 	/**
 	 * 奖品价格
 	 */
-	private Integer prizePrice;
+	private Long prizePrice;
 	/**
 	 * 奖品图片
 	 */

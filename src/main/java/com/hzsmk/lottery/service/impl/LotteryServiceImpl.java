@@ -11,13 +11,8 @@ import com.hzsmk.common.exception.BusinessException;
 import com.hzsmk.common.util.SmkAppUser;
 import com.hzsmk.common.util.SmkTokenUtil;
 import com.hzsmk.lottery.consts.LotteryConsts;
-import com.hzsmk.lottery.dao.LotteryActCodeDao;
-import com.hzsmk.lottery.dao.LotteryActPrizeDao;
-import com.hzsmk.lottery.dao.LotteryActivityDao;
-import com.hzsmk.lottery.dao.LotteryHelpRecordDao;
-import com.hzsmk.lottery.entity.LotteryActCodeEntity;
-import com.hzsmk.lottery.entity.LotteryActivityEntity;
-import com.hzsmk.lottery.entity.LotteryHelpRecordEntity;
+import com.hzsmk.lottery.dao.*;
+import com.hzsmk.lottery.entity.*;
 import com.hzsmk.lottery.entity.eo.Prize;
 import com.hzsmk.lottery.req.in.*;
 import com.hzsmk.lottery.req.out.GetActInfoOut;
@@ -32,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.validation.constraints.NotEmpty;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Auther: 18698
@@ -47,6 +43,8 @@ public class LotteryServiceImpl implements LotteryService {
     private LotteryActCodeDao actCodeDao;
     @Resource
     private LotteryActPrizeDao actPrizeDao;
+    @Resource
+    private LotteryPrizeDao prizeDao;
     @Resource
     private LotteryHelpRecordDao helpRecordDao;
 
@@ -287,8 +285,26 @@ public class LotteryServiceImpl implements LotteryService {
             List<LotteryActivityEntity> list = activityDao.selectActByUserId(userId, lotteryStatus);
             //循环活动列表，判断用户是否中奖
             for (LotteryActivityEntity lotteryActivityEntity : list) {
-                //todo 还没做完
                 GetMyPrizeAct getMyPrizeAct = new GetMyPrizeAct();
+                //todo 还没做完
+                List<LotteryActCodeEntity> codeList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
+                        .eq(LotteryActCodeEntity::getActId, lotteryActivityEntity.getId())
+                        .eq(LotteryActCodeEntity::getUserId,userId)
+                        .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N));
+                //按照中奖状态进行排序
+                List<LotteryActCodeEntity> collect = codeList.stream().sorted(Comparator.comparing(LotteryActCodeEntity::getPrizeStatus).reversed()).collect(Collectors.toList());
+                LotteryActCodeEntity lotteryCode = collect.get(0);
+                if(LotteryConsts.PRIZE_STATUS_WIN.equals(lotteryCode.getPrizeStatus())){
+                    //如果中奖了需要取出奖品ID，查询奖品图片
+                    LotteryPrizeEntity prize=prizeDao.selectById(lotteryCode.getPrizeId());
+                    getMyPrizeAct.setPrizePrice(prize.getPrizePrice());
+                    getMyPrizeAct.setImgUrl(prize.getImgUrl());
+                }
+
+
+
+
+
                 completedList.add(getMyPrizeAct);
             }
             getMyPrizeOut.setCompletedList(completedList);
