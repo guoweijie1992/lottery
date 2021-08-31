@@ -4,6 +4,7 @@ import com.hzsmk.common.base.RestResponse;
 import com.hzsmk.lottery.reqIn.GetActInfoIn;
 import com.hzsmk.lottery.reqIn.GetActUserInfoIn;
 import com.hzsmk.lottery.reqIn.GetCodeIn;
+import com.hzsmk.lottery.reqIn.GetHelpInfoIn;
 
 /**
  * @Auther: 18698
@@ -17,4 +18,6 @@ public interface LotteryService {
     RestResponse getActUserInfo(GetActUserInfoIn param);
 
     RestResponse getCode(GetCodeIn param);
+
+    RestResponse getHelpInfo(GetHelpInfoIn param);
 }

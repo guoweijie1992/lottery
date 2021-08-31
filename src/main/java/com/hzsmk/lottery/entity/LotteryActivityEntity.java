@@ -57,6 +57,10 @@ public class LotteryActivityEntity implements Serializable {
 	 */
 	private Integer maxHelp;
 	/**
+	 * 最大奖券数量
+	 */
+	private Integer maxCodeCounts;
+	/**
 	 * 活动规则链接
 	 */
 	private String actRule;

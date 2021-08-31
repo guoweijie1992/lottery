@@ -97,4 +97,7 @@ public class LotteryActCodeEntity implements Serializable {
 		this.codeType = codeType;
 		this.ifFirstJoin = ifFirstJoin;
 	}
+
+	public LotteryActCodeEntity() {
+	}
 }
