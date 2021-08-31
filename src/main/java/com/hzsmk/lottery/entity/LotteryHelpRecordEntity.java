@@ -41,6 +41,10 @@ public class LotteryHelpRecordEntity implements Serializable {
 	 */
 	private Long codeId;
 	/**
+	 * 活动ID
+	 */
+	private Long actId;
+	/**
 	 * 
 	 */
 	private Date updateTime;
@@ -49,4 +53,15 @@ public class LotteryHelpRecordEntity implements Serializable {
 	 */
 	private Date createTime;
 
+	public LotteryHelpRecordEntity(String helpUserId, String helpMobile, String helpUserImg, Long codeId, Date createTime,Long actId) {
+		this.helpUserId = helpUserId;
+		this.helpMobile = helpMobile;
+		this.helpUserImg = helpUserImg;
+		this.codeId = codeId;
+		this.createTime = createTime;
+		this.actId = actId;
+	}
+
+	public LotteryHelpRecordEntity() {
+	}
 }

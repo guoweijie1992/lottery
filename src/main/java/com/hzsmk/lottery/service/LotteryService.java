@@ -1,10 +1,7 @@
 package com.hzsmk.lottery.service;
 
 import com.hzsmk.common.base.RestResponse;
-import com.hzsmk.lottery.reqIn.GetActInfoIn;
-import com.hzsmk.lottery.reqIn.GetActUserInfoIn;
-import com.hzsmk.lottery.reqIn.GetCodeIn;
-import com.hzsmk.lottery.reqIn.GetHelpInfoIn;
+import com.hzsmk.lottery.req.in.*;
 
 /**
  * @Auther: 18698
@@ -20,4 +17,6 @@ public interface LotteryService {
     RestResponse getCode(GetCodeIn param);
 
     RestResponse getHelpInfo(GetHelpInfoIn param);
+
+    RestResponse help(HelpIn param);
 }

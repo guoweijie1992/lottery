@@ -1,14 +1,12 @@
 package com.hzsmk.lottery.controller;
 
 import com.hzsmk.common.base.RestResponse;
-import com.hzsmk.lottery.reqIn.GetActInfoIn;
-import com.hzsmk.lottery.reqIn.GetActUserInfoIn;
-import com.hzsmk.lottery.reqIn.GetCodeIn;
-import com.hzsmk.lottery.reqIn.GetHelpInfoIn;
+import com.hzsmk.lottery.req.in.*;
 import com.hzsmk.lottery.service.LotteryService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * @Auther: 18698
@@ -26,7 +24,7 @@ public class LotteryController {
      * @return
      */
     @RequestMapping("lottery/getActInfo")
-    public RestResponse getActInfo(@RequestBody GetActInfoIn param){
+    public RestResponse getActInfo(@Valid @RequestBody GetActInfoIn param){
         return lotteryService.getActInfo(param);
     }
 
@@ -36,7 +34,7 @@ public class LotteryController {
      * @return
      */
     @RequestMapping("lottery/actUserInfo")
-    public RestResponse getActUserInfo(@RequestBody GetActUserInfoIn param){
+    public RestResponse getActUserInfo(@Valid @RequestBody GetActUserInfoIn param){
         return lotteryService.getActUserInfo(param);
     }
 
@@ -47,18 +45,28 @@ public class LotteryController {
      * @return
      */
     @RequestMapping("lottery/getCode")
-    public RestResponse getCode(@RequestBody GetCodeIn param){
+    public RestResponse getCode(@Valid @RequestBody GetCodeIn param){
         return lotteryService.getCode(param);
     }
 
 
     /**
-     * 立即抽奖获取券码
+     * 获取助力页面详情
      * @param param
      * @return
      */
     @RequestMapping("lottery/getHelpInfo")
-    public RestResponse getHelpInfo(@RequestBody GetHelpInfoIn param){
+    public RestResponse getHelpInfo(@Valid @RequestBody GetHelpInfoIn param){
         return lotteryService.getHelpInfo(param);
+    }
+
+    /**
+     * 助力获取奖券
+     * @param param
+     * @return
+     */
+    @RequestMapping("lottery/help")
+    public RestResponse help(@Valid @RequestBody HelpIn param){
+        return lotteryService.help(param);
     }
 }

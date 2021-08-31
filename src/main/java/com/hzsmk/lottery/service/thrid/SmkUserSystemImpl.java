@@ -2,14 +2,13 @@ package com.hzsmk.lottery.service.thrid;
 
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
+import com.hzsmk.common.exception.BusinessException;
 import com.hzsmk.common.util.TLocalHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,7 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-public class SmkUserSystemImpl {
+public class SmkUserSystemImpl implements SmkUserSystem{
 
     @Autowired
     private Environment env;
@@ -67,5 +66,58 @@ public class SmkUserSystemImpl {
         String rep = HttpUtil.createPost(env.getProperty("userSystem.url")).headerMap( head, true).body(JSONUtil.toJsonStr(param)).execute().body();
         ret = JSONUtil.toBean(rep,Map.class);
         return ret;
+    }
+
+    /**
+     * 手机号获取用户userId
+     * @param mobile
+     * @return
+     */
+    @Override
+    public String getUserIdByMobile(String mobile) {
+        //调用统一用户校验用户是否存在
+        Map<String, String> param = new HashMap<String, String>();
+        param.put("user_id", mobile);
+        param.put("user_name_type", "1");
+        Map<String, Object> ret = postUserSystem("TRA003010122", param);
+        String userId = null;
+        if ("0004".equals(ret.get("code"))) {
+            throw new BusinessException("助力手机号不存在");
+        } else if ("0000".equals(ret.get("code"))) {
+            //代表用户已注册根据userId调用token生成
+            userId = ((Map<String, String>) ((List) ret.get("list")).get(0)).get("user_id");
+            return userId;
+        } else {
+            log.info(JSONUtil.toJsonStr(ret));
+            throw new BusinessException("获取用户信息失败");
+        }
+    }
+
+    /**
+     * userId获取用户信息
+     * @param userId
+     * @return
+     */
+    @Override
+    public Map getUserInfo(String userId) {
+        //调用统一用户校验用户是否存在
+        Map<String, String> param = new HashMap<String, String>();
+        Map<String, String> retMap = new HashMap<String, String>();
+        param.put("user_id", userId);
+        Map<String, Object> ret = postUserSystem("TRA003010105", param);
+        if (!"0000".equals(ret.get("code"))) {
+            throw new BusinessException("获取用户信息失败");
+        } else {
+            List userList = (List) ret.get("list");
+            Map<String, String> listMap = (Map<String, String>) userList.get(0);
+            retMap.put("mobile", (String) listMap.get("mobile"));
+            retMap.put("nickname", (String) listMap.get("nickname"));
+            retMap.put("name", (String) listMap.get("name"));
+            retMap.put("idCard", (String) listMap.get("id_no"));
+            retMap.put("lev", (String) listMap.get("user_level"));
+            retMap.put("headImageUrl", (String) listMap.get("head_img_url"));
+            retMap.put("userId", userId);
+        }
+        return retMap;
     }
 }

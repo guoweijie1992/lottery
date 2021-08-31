@@ -1,8 +1,9 @@
-package com.hzsmk.lottery.reqIn;
+package com.hzsmk.lottery.req.in;
 
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * @Auther: 18698
@@ -10,9 +11,9 @@ import javax.validation.constraints.NotEmpty;
  * @Description:
  */
 @Data
-public class GetHelpInfoIn {
+public class HelpIn {
 
-    @NotEmpty(message = "活动id不能为空")
+    @NotNull(message = "活动id不能为空")
     private  Long actId;
 
     @NotEmpty(message = "accessToken不能为空")
