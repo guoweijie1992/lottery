@@ -6,6 +6,8 @@ springboot + mysql + mybatisplus
 /home/smkapp/tomcat/lottery
 
 测试数据库：192.168.23.212:3306/smk_lottery   root 123456
+
+
 CREATE TABLE `lottery_act_code` (
   `id` bigint(20) NOT NULL COMMENT '主键id',
   `act_id` bigint(20) NOT NULL COMMENT '活动主键id',

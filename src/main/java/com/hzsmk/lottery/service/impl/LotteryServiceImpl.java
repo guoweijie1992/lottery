@@ -46,6 +46,8 @@ public class LotteryServiceImpl implements LotteryService {
     @Resource
     private LotteryPrizeDao prizeDao;
     @Resource
+    private LotteryBlackListDao blackListDao;
+    @Resource
     private LotteryHelpRecordDao helpRecordDao;
 
     @Autowired
@@ -348,6 +350,16 @@ public class LotteryServiceImpl implements LotteryService {
         List<LotteryActCodeEntity> actCodeList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
                 .eq(LotteryActCodeEntity::getActId, actId)
                 .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N));
+        //3.筛选出黑名单用户
+        List<LotteryBlackListEntity> blackList = blackListDao.selectList(new QueryWrapper<LotteryBlackListEntity>().lambda()
+                .eq(LotteryBlackListEntity::getActId, actId)
+                .eq(LotteryBlackListEntity::getStatus, LotteryConsts.CAN_JOIN_N));
+        System.out.println("更新黑名单前奖券数量"+actCodeList.size());
+        if(ObjectUtil.isNotEmpty(blackList)){
+            List<String> blackUserIdList = blackList.stream().parallel().map(b -> b.getUserId()).distinct().collect(Collectors.toList());
+            actCodeList = actCodeList.stream().parallel().filter(p -> !blackUserIdList.contains(p.getUserId())).collect(Collectors.toList());
+            System.out.println("更新黑名单后奖券数量"+actCodeList.size());
+        }
         Set<String> codeList = actCodeList.stream().parallel().map(e -> e.getLotteryCode()).collect(Collectors.toSet());
         Map<String, List<LotteryActCodeEntity>> codeEntityList = actCodeList.stream().parallel().collect(Collectors.groupingBy(e1 -> e1.getLotteryCode()));
         Map<String, List<LotteryActCodeEntity>> userIdEntityList = actCodeList.stream().parallel().collect(Collectors.groupingBy(e1 -> e1.getUserId()));
@@ -363,7 +375,7 @@ public class LotteryServiceImpl implements LotteryService {
                     System.out.println("中奖啦" + entity1);
                     //todo 更新中奖表
                 }
-                return;
+                break;
             }
             for (int i = 0; i < amount; i++) {
                 //从code列表中随机选取一个
@@ -380,13 +392,15 @@ public class LotteryServiceImpl implements LotteryService {
                 System.out.println("查询userId："+userId+"对应奖券数量"+lotteryActCodeEntities.size());
                 for (LotteryActCodeEntity lotteryActCodeEntity : lotteryActCodeEntities) {
                     codeList.remove(lotteryActCodeEntity.getLotteryCode());
+                    //用户表也要删除，不然后续的奖品会覆盖
+                    userIdEntityList.remove(userId);
                     System.out.println("删除userId："+userId+"对应奖券");
                 }
             }
-            //变更剩余条数
-            int i = actCodeDao.updateElse(actId, LotteryConsts.PRIZE_STATUS_WIN, LotteryConsts.PRIZE_STATUS_LOSE);
-            System.out.println("变更剩余券码数量为lose，数量为"+i);
         }
+        //变更剩余条数
+//            int i = actCodeDao.updateElse(actId, LotteryConsts.PRIZE_STATUS_WIN, LotteryConsts.PRIZE_STATUS_LOSE);
+//            System.out.println("变更剩余券码数量为lose，数量为"+i);
     }
 
 

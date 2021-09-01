@@ -49,7 +49,7 @@ public class LotteryStartJob extends QuartzJobBean {
             try {
                 LotteryActivityEntity entity = list.get(i);
                 //开始时间大于当前时间则变更为活动进行中
-                if(entity.getStartTime().compareTo(new Date())>=0){
+                if(entity.getStartTime().compareTo(new Date())<=0){
                     entity.setLotteryStatus(LotteryConsts.LOTTERY_STATUS_PLAYING);
                     int update = activityDao.updateById(entity);
                     if(update<1){

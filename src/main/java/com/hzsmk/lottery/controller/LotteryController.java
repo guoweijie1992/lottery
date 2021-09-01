@@ -1,11 +1,15 @@
 package com.hzsmk.lottery.controller;
 
 import com.hzsmk.common.base.RestResponse;
+import com.hzsmk.lottery.dao.LotteryActivityDao;
+import com.hzsmk.lottery.entity.LotteryActivityEntity;
 import com.hzsmk.lottery.req.in.*;
 import com.hzsmk.lottery.service.LotteryService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 
 /**
@@ -17,6 +21,9 @@ import javax.validation.Valid;
 public class LotteryController {
     @Autowired
     private LotteryService lotteryService;
+
+    @Resource
+    private LotteryActivityDao activityDao;
 
     /**
      * 根据id获取活动详情
@@ -82,14 +89,22 @@ public class LotteryController {
 
     /**
      * 通知奖品已展示
-     */
-    /**
-     * 我的奖品
      * @param param
      * @return
      */
     @RequestMapping("lottery/notified")
     public RestResponse notified(@Valid @RequestBody NotifiedIn param){
         return lotteryService.notified(param);
+    }
+
+    /**
+     * 通知奖品已展示
+     * @param actId 奖品id
+     * @return
+     */
+    @RequestMapping("lottery/testDraw")
+    public void draw(@Valid @Param("actId") String actId){
+        LotteryActivityEntity lotteryActivityEntity = activityDao.selectById(actId);
+        lotteryService.draw(lotteryActivityEntity);
     }
 }

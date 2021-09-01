@@ -70,5 +70,11 @@ public final class LotteryConsts {
     public static final String PRIZE_TYPE_AWAITING="awaiting";
     public static final String PRIZE_TYPE_COMPLETED="completed";
 
+    /**
+     * 是否可参与 0不可参与 1可参与
+     */
+    public static final Integer CAN_JOIN_N=0;
+    public static final Integer CAN_JOIN_Y=1;
+
 
 }
