@@ -82,10 +82,11 @@ public class LotteryServiceImpl implements LotteryService {
         if (ObjectUtil.isNull(appUser)) {
             return RestResponse.errorBusinessResult("token解析失败");
         }
-        //2.根据活动id查询code列表
+        //2.根据活动id和userId查询code列表
         List<LotteryActCodeEntity> codeList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
                 .eq(LotteryActCodeEntity::getActId, param.getActId())
-                .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N));
+                .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N)
+                .eq(LotteryActCodeEntity::getUserId,appUser.getUserId()));
         List<String> actCodeList = new LinkedList<>();
         if (ObjectUtil.isEmpty(codeList)) {
             ret.put("attendStatus", "unjoin");
