@@ -286,6 +286,7 @@ public class LotteryServiceImpl implements LotteryService {
                 getMyPrizeAct.setLotteryId(actEntity.getId());
                 getMyPrizeAct.setPrizeStatus(codeEntity.getPrizeStatus());
                 getMyPrizeAct.setLotteryCode(codeEntity.getLotteryCode());
+                getMyPrizeAct.setLotteryCodeId(codeEntity.getId());
                 if(LotteryConsts.PRIZE_STATUS_WIN.equals(codeEntity.getPrizeStatus())){
                     //如果中奖了需要取出奖品ID，查询奖品图片
                     Prize prize=prizeDao.selectByPrizeIdAndActId(codeEntity.getPrizeId(),actEntity.getId());
