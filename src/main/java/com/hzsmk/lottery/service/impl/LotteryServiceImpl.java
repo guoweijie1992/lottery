@@ -59,7 +59,7 @@ public class LotteryServiceImpl implements LotteryService {
         if (!ApiConsts.SUCCESS_CODE.equals(restResponse.getCode())) {
             return restResponse;
         }
-        LotteryActivityEntity act = (LotteryActivityEntity)restResponse.getResponse();
+        LotteryActivityEntity act = (LotteryActivityEntity) restResponse.getResponse();
         //3.获取活动对应奖品
         List<Prize> prizes = actPrizeDao.selectPrizeByActId(act.getId());
         //4.组装返回参数
@@ -68,7 +68,6 @@ public class LotteryServiceImpl implements LotteryService {
         getActInfoOut.setPrizeList(prizes);
         return RestResponse.successResult(getActInfoOut);
     }
-
 
 
     @Override
@@ -86,7 +85,7 @@ public class LotteryServiceImpl implements LotteryService {
         List<LotteryActCodeEntity> codeList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
                 .eq(LotteryActCodeEntity::getActId, param.getActId())
                 .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N)
-                .eq(LotteryActCodeEntity::getUserId,appUser.getUserId()));
+                .eq(LotteryActCodeEntity::getUserId, appUser.getUserId()));
         List<String> actCodeList = new LinkedList<>();
         if (ObjectUtil.isEmpty(codeList)) {
             ret.put("attendStatus", "unjoin");
@@ -164,8 +163,8 @@ public class LotteryServiceImpl implements LotteryService {
         ret.put("endTime", act.getEndTime());
         ret.put("lotteryStatus", act.getLotteryStatus());
         ret.put("shareImgUrl", act.getShareImgUrl());
-        ret.put("subTitle",act.getSubTitle());
-        ret.put("prizeImg",prizes.get(0).getImgUrl());
+        ret.put("subTitle", act.getSubTitle());
+        ret.put("prizeImg", prizes.get(0).getImgUrl());
         ret.put("headImgUrl", userInfo.get("headImageUrl"));
         //返回前端
         return RestResponse.successResult(ret);
@@ -246,7 +245,7 @@ public class LotteryServiceImpl implements LotteryService {
                 GetMyPrizeAct getMyPrizeAct = new GetMyPrizeAct();
                 List<LotteryActCodeEntity> codeList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
                         .eq(LotteryActCodeEntity::getActId, lotteryActivityEntity.getId())
-                        .eq(LotteryActCodeEntity::getUserId,userId)
+                        .eq(LotteryActCodeEntity::getUserId, userId)
                         .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N));
                 //若有记录返回code列表
                 List<String> actCodeList = new LinkedList<>();
@@ -277,7 +276,7 @@ public class LotteryServiceImpl implements LotteryService {
                 GetMyPrizeAct getMyPrizeAct = new GetMyPrizeAct();
                 List<LotteryActCodeEntity> codeList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
                         .eq(LotteryActCodeEntity::getActId, actEntity.getId())
-                        .eq(LotteryActCodeEntity::getUserId,userId)
+                        .eq(LotteryActCodeEntity::getUserId, userId)
                         .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N));
                 //按照中奖状态进行排序
                 List<LotteryActCodeEntity> collect = codeList.stream().sorted(Comparator.comparing(LotteryActCodeEntity::getPrizeStatus).reversed()).collect(Collectors.toList());
@@ -287,19 +286,19 @@ public class LotteryServiceImpl implements LotteryService {
                 getMyPrizeAct.setPrizeStatus(codeEntity.getPrizeStatus());
                 getMyPrizeAct.setLotteryCode(codeEntity.getLotteryCode());
                 getMyPrizeAct.setLotteryCodeId(codeEntity.getId());
-                if(LotteryConsts.PRIZE_STATUS_WIN.equals(codeEntity.getPrizeStatus())){
+                if (LotteryConsts.PRIZE_STATUS_WIN.equals(codeEntity.getPrizeStatus())) {
                     //如果中奖了需要取出奖品ID，查询奖品图片
-                    Prize prize=prizeDao.selectByPrizeIdAndActId(codeEntity.getPrizeId(),actEntity.getId());
+                    Prize prize = prizeDao.selectByPrizeIdAndActId(codeEntity.getPrizeId(), actEntity.getId());
                     getMyPrizeAct.setPrizePrice(prize.getPrizePrice());
                     getMyPrizeAct.setPrizeName(prize.getPrizeName());
                     getMyPrizeAct.setImgUrl(prize.getImgUrl());
                     getMyPrizeAct.setUseUrl(prize.getUseUrl());
                     getMyPrizeAct.setLotteryId(codeEntity.getId());
                     //如果中奖了且未展示，需要展示活动中奖号码等字段
-                    if(LotteryConsts.IF_NOTICE_N.equals(codeEntity.getIfNotice())){
-                        getMyPrizeAct.setIfNotice(LotteryConsts.IF_NOTICE_N.equals(codeEntity.getIfNotice())?"y":"n");
+                    if (LotteryConsts.IF_NOTICE_N.equals(codeEntity.getIfNotice())) {
+                        getMyPrizeAct.setIfNotice(LotteryConsts.IF_NOTICE_N.equals(codeEntity.getIfNotice()) ? "y" : "n");
                     }
-                }else{
+                } else {
                     //如果没有中奖，需要查询活动对应的奖品,取第一个
                     List<Prize> prizes = actPrizeDao.selectPrizeByActId(actEntity.getId());
                     getMyPrizeAct.setPrizePrice(prizes.get(0).getPrizePrice());
@@ -315,6 +314,7 @@ public class LotteryServiceImpl implements LotteryService {
 
     /**
      * 通知已展示
+     *
      * @param param
      * @return
      */
@@ -323,16 +323,76 @@ public class LotteryServiceImpl implements LotteryService {
         LotteryActCodeEntity entity = actCodeDao.selectById(param.getLotteryCodeId());
         entity.setIfNotice(LotteryConsts.IF_NOTICE_Y);
         int i = actCodeDao.updateById(entity);
-        if(i>0){
+        if (i > 0) {
             return RestResponse.success();
-        }else{
+        } else {
             return RestResponse.errorBusinessResult("保存数据失败");
+        }
+    }
+
+    /**
+     * 活动开奖
+     *
+     * @param entity
+     */
+    @Override
+    public void draw(LotteryActivityEntity entity) {
+        /**
+         * 1.一个人只有一个中奖名额
+         * 2.优先中高的奖品
+         */
+        //1.获取活动的奖品
+        Long actId = entity.getId();
+        List<Prize> prizes = actPrizeDao.selectPrizeByActId(actId);
+        //2.获取参与活动的用户
+        List<LotteryActCodeEntity> actCodeList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
+                .eq(LotteryActCodeEntity::getActId, actId)
+                .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N));
+        Set<String> codeList = actCodeList.stream().parallel().map(e -> e.getLotteryCode()).collect(Collectors.toSet());
+        Map<String, List<LotteryActCodeEntity>> codeEntityList = actCodeList.stream().parallel().collect(Collectors.groupingBy(e1 -> e1.getLotteryCode()));
+        Map<String, List<LotteryActCodeEntity>> userIdEntityList = actCodeList.stream().parallel().collect(Collectors.groupingBy(e1 -> e1.getUserId()));
+
+        //3.从等级高到低随机抽取collect的元素
+        for (Prize prize : prizes) {
+            //获取奖品数量
+            Integer amount = prize.getAmount();
+            //奖品数量超过剩余抽奖人数，则每个人都中奖
+            if (amount >= userIdEntityList.size()) {
+                for (Map.Entry<String, List<LotteryActCodeEntity>> s : userIdEntityList.entrySet()) {
+                    LotteryActCodeEntity entity1 = s.getValue().get(0);
+                    System.out.println("中奖啦" + entity1);
+                    //todo 更新中奖表
+                }
+                return;
+            }
+            for (int i = 0; i < amount; i++) {
+                //从code列表中随机选取一个
+                String s = (String) RandomUtil.randomEle(codeList.toArray());
+                System.out.println("获取奖券"+s);
+                //获取到对应实体类
+                LotteryActCodeEntity winEntity = codeEntityList.get(s).get(0);
+                System.out.println("中奖啦" + winEntity);
+                //todo 更新中奖表
+                //从codeList中删除该用户的奖券
+                String userId = winEntity.getUserId();
+                System.out.println(s+"奖券对应userId"+userId);
+                List<LotteryActCodeEntity> lotteryActCodeEntities = userIdEntityList.get(userId);
+                System.out.println("查询userId："+userId+"对应奖券数量"+lotteryActCodeEntities.size());
+                for (LotteryActCodeEntity lotteryActCodeEntity : lotteryActCodeEntities) {
+                    codeList.remove(lotteryActCodeEntity.getLotteryCode());
+                    System.out.println("删除userId："+userId+"对应奖券");
+                }
+            }
+            //变更剩余条数
+            int i = actCodeDao.updateElse(actId, LotteryConsts.PRIZE_STATUS_WIN, LotteryConsts.PRIZE_STATUS_LOSE);
+            System.out.println("变更剩余券码数量为lose，数量为"+i);
         }
     }
 
 
     /**
      * 判断活动状态
+     *
      * @param actId
      * @return
      */
@@ -491,5 +551,7 @@ public class LotteryServiceImpl implements LotteryService {
             }
         }
     }
+
+
 
 }

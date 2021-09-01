@@ -35,20 +35,20 @@ public class LotteryStartJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) {
         String seq = TLocalHelper.createSeq();
         Thread.currentThread().setName(seq);
-        log.info("********执行抽奖活动定时开始活动任务开始********");
+        log.info("********执行抽奖活动定时活动任务 unplayed-playing开始********");
         //进行中的活动查询是否超时
         List<LotteryActivityEntity> list = activityDao.selectList(new QueryWrapper<LotteryActivityEntity>().lambda()
                 .eq(LotteryActivityEntity::getIfDelete, LotteryConsts.IFDELETE_N)
                 .eq(LotteryActivityEntity::getLotteryStatus, LotteryConsts.LOTTERY_STATUS_UNPLAYED));
         if(ObjectUtils.isEmpty(list)||list.size()<1){
-            log.info("********执行抽奖活动定时开始活动任务开始********");
+            log.info("********执行抽奖活动定时活动任务 unplayed-playing结束********");
             return ;
         }
         // 遍历数据,处理
         for (int i = 0, size = list.size(); i < size; i++) {
             try {
                 LotteryActivityEntity entity = list.get(i);
-                //结束时间超过当前时间则变更为待抽奖
+                //开始时间大于当前时间则变更为活动进行中
                 if(entity.getStartTime().compareTo(new Date())>=0){
                     entity.setLotteryStatus(LotteryConsts.LOTTERY_STATUS_PLAYING);
                     int update = activityDao.updateById(entity);
@@ -57,10 +57,10 @@ public class LotteryStartJob extends QuartzJobBean {
                     }
                 }
             } catch (Exception e) {
-                log.error("执行抽奖活动定时开始活动任务错误:{}", e);
+                log.error("执行抽奖活动定时活动任务 unplayed-playing错误:{}", e);
                 continue;
             }
         }
-        log.info("********执行抽奖活动定时开始活动任务开始********");
+        log.info("********执行抽奖活动定时活动任务 unplayed-playing结束********");
     }
 }

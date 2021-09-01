@@ -1,6 +1,7 @@
 package com.hzsmk.lottery.service;
 
 import com.hzsmk.common.base.RestResponse;
+import com.hzsmk.lottery.entity.LotteryActivityEntity;
 import com.hzsmk.lottery.req.in.*;
 
 /**
@@ -23,4 +24,6 @@ public interface LotteryService {
     RestResponse getMyPrize(GetMyPrizeIn param);
 
     RestResponse notified(NotifiedIn param);
+
+    void draw(LotteryActivityEntity entity);
 }

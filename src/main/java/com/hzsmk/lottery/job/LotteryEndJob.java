@@ -37,13 +37,13 @@ public class LotteryEndJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) {
         String seq = TLocalHelper.createSeq();
         Thread.currentThread().setName(seq);
-        log.info("********执行抽奖活动定时关闭活动任务开始********");
+        log.info("********执行抽奖活动定时活动任务 playing-awaiting开始********");
         //进行中的活动查询是否超时
         List<LotteryActivityEntity> list = activityDao.selectList(new QueryWrapper<LotteryActivityEntity>().lambda()
                 .eq(LotteryActivityEntity::getIfDelete, LotteryConsts.IFDELETE_N)
                 .eq(LotteryActivityEntity::getLotteryStatus, LotteryConsts.LOTTERY_STATUS_PLAYING));
         if(ObjectUtils.isEmpty(list)||list.size()<1){
-            log.info("********执行抽奖活动定时关闭活动任务开始********");
+            log.info("********执行抽奖活动定时活动任务 playing-awaiting结束********");
             return ;
         }
         // 遍历数据,处理
@@ -59,10 +59,10 @@ public class LotteryEndJob extends QuartzJobBean {
                     }
                 }
             } catch (Exception e) {
-                log.error("执行抽奖活动定时关闭活动任务错误:{}", e);
+                log.error("执行抽奖活动定时活动任务 playing-awaiting错误:{}", e);
                 continue;
             }
         }
-        log.info("********执行抽奖活动定时关闭活动任务开始********");
+        log.info("********执行抽奖活动定时活动任务 playing-awaiting结束********");
     }
 }

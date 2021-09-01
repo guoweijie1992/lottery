@@ -3,6 +3,9 @@ package com.hzsmk.lottery.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hzsmk.lottery.entity.LotteryActCodeEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * 
@@ -13,5 +16,14 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface LotteryActCodeDao extends BaseMapper<LotteryActCodeEntity> {
-	
+
+    @Update("<script>" +
+            "UPDATE lottery_act_code  " +
+            "SET prize_status = #{newStatus}  " +
+            "WHERE " +
+            " if_delete = 0  " +
+            " AND act_id = #{actId}  " +
+            " AND prize_status != #{condition} "+
+            "</script>")
+    int updateElse(@Param("actId") Long actId,@Param("condition")String condition,@Param("newStatus")String newStatus);
 }
