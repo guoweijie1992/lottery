@@ -33,7 +33,8 @@ public class LotteryStartJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
-        TLocalHelper.createSeq();
+        String seq = TLocalHelper.createSeq();
+        Thread.currentThread().setName(seq);
         log.info("********执行抽奖活动定时开始活动任务开始********");
         //进行中的活动查询是否超时
         List<LotteryActivityEntity> list = activityDao.selectList(new QueryWrapper<LotteryActivityEntity>().lambda()

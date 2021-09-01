@@ -42,8 +42,7 @@ public class QuartzConfiguration {
     }
 
     /**
-     *
-     *
+     * 抽奖活动进行中-待开奖
      * @return
      */
     @Bean
@@ -61,19 +60,43 @@ public class QuartzConfiguration {
     public Trigger lotteryStartCronTrigger() {
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(lotteryStartCron);
         return TriggerBuilder.newTrigger()
-                .forJob(lotteryEndScheduleDetail())
+                .forJob(lotteryStartScheduleDetail())
                 .withIdentity("lotteryStartCronTrigger")
                 .withSchedule(cronScheduleBuilder)
                 .build();
     }
 
     /**
-     * 住房补贴每月定时审核任务
-     *
+     * 抽奖活动未开始-进行中
      * @return
      */
     @Bean
     public JobDetail lotteryStartScheduleDetail() {
         return JobBuilder.newJob(LotteryStartJob.class).withIdentity("lotteryStartJob").storeDurably().build();
+    }
+
+
+    /**
+     * 把jobDetail注册到Cron表达式的trigger上去
+     *
+     * @return
+     */
+    @Bean
+    public Trigger lotteryDrawCronTrigger() {
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(lotteryDrawCron);
+        return TriggerBuilder.newTrigger()
+                .forJob(lotteryDrawScheduleDetail())
+                .withIdentity("lotteryDrawCronTrigger")
+                .withSchedule(cronScheduleBuilder)
+                .build();
+    }
+
+    /**
+     * 抽奖活动待开奖-已结束
+     * @return
+     */
+    @Bean
+    public JobDetail lotteryDrawScheduleDetail() {
+        return JobBuilder.newJob(LotteryDrawJob.class).withIdentity("lotteryDrawJob").storeDurably().build();
     }
 }

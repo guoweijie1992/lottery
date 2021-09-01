@@ -126,7 +126,7 @@ public class LotteryServiceImpl implements LotteryService {
         //判断是否首次参加活动
         Integer ifFirst = ifFirstJoin(appUser);
         LotteryActCodeEntity entity = new LotteryActCodeEntity(act.getId(), appUser.getUserId(), appUser.getMobile(),
-                lotteryCode, LotteryConsts.LOTTERY_STATUS_PLAYING, new Date(), LotteryConsts.IFDELETE_N, LotteryConsts.CODETYPE_SELF, ifFirst);
+                lotteryCode, new Date(), LotteryConsts.IFDELETE_N, LotteryConsts.CODETYPE_SELF, ifFirst);
         int insert = actCodeDao.insert(entity);
         if (insert > 0) {
             ret.put("lotteryCode", lotteryCode);
@@ -202,7 +202,7 @@ public class LotteryServiceImpl implements LotteryService {
         //判断是否首次参加活动
         Integer ifFirst = ifFirstJoin(userId);
         LotteryActCodeEntity entity = new LotteryActCodeEntity(act.getId(), userId, mobile,
-                lotteryCode, LotteryConsts.LOTTERY_STATUS_PLAYING, new Date(), LotteryConsts.IFDELETE_N, LotteryConsts.CODETYPE_HELP, ifFirst);
+                lotteryCode, new Date(), LotteryConsts.IFDELETE_N, LotteryConsts.CODETYPE_HELP, ifFirst);
         int insert = actCodeDao.insert(entity);
         if (insert > 0) {
             ret.put("lotteryCode", lotteryCode);

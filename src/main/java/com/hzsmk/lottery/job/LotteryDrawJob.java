@@ -5,13 +5,10 @@ import com.hzsmk.common.util.TLocalHelper;
 import com.hzsmk.lottery.consts.LotteryConsts;
 import com.hzsmk.lottery.dao.LotteryActivityDao;
 import com.hzsmk.lottery.entity.LotteryActivityEntity;
-import com.hzsmk.lottery.service.LotteryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +24,7 @@ import java.util.List;
 @Slf4j
 @DisallowConcurrentExecution
 @Service
-public class LotteryEndJob extends QuartzJobBean {
+public class LotteryDrawJob extends QuartzJobBean {
 
     @Resource
     private LotteryActivityDao activityDao;
@@ -37,7 +34,7 @@ public class LotteryEndJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) {
         String seq = TLocalHelper.createSeq();
         Thread.currentThread().setName(seq);
-        log.info("********执行抽奖活动定时关闭活动任务开始********");
+        log.info("********执行抽奖活动定时活动任务 开奖开始********");
         //进行中的活动查询是否超时
         List<LotteryActivityEntity> list = activityDao.selectList(new QueryWrapper<LotteryActivityEntity>().lambda()
                 .eq(LotteryActivityEntity::getIfDelete, LotteryConsts.IFDELETE_N)

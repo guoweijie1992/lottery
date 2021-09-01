@@ -40,10 +40,7 @@ public class LotteryActCodeEntity implements Serializable {
 	 * 券码
 	 */
 	private String lotteryCode;
-	/**
-	 * 开奖状态 unplayed 未开始/playing 进行中/awaiting 待开奖/completed 已开奖
-	 */
-	private String lotteryStatus;
+
 	/**
 	 * 中奖状态 win已中奖 lose未中奖
 	 */
@@ -85,13 +82,12 @@ public class LotteryActCodeEntity implements Serializable {
 	 */
 	private Integer syncCounts;
 
-	public LotteryActCodeEntity(Long actId, String userId, String mobile, String lotteryCode, String lotteryStatus, Date createTime,
+	public LotteryActCodeEntity(Long actId, String userId, String mobile, String lotteryCode, Date createTime,
 								Integer ifDelete, Integer codeType, Integer ifFirstJoin) {
 		this.actId = actId;
 		this.userId = userId;
 		this.mobile = mobile;
 		this.lotteryCode = lotteryCode;
-		this.lotteryStatus = lotteryStatus;
 		this.createTime = createTime;
 		this.ifDelete = ifDelete;
 		this.codeType = codeType;
