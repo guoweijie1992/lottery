@@ -21,13 +21,14 @@ public interface LotteryActPrizeDao extends BaseMapper<LotteryActPrizeEntity> {
             " a.level_desc, " +
             " a.amount, " +
             " a.description, " +
-            " a.sort, " +
+            " a.sort," +
+            " a.use_url, " +
             " b.img_url, " +
             " b.prize_name, " +
             " b.prize_price  " +
             "FROM " +
-            " lottery_act_prize a " +
-            " LEFT JOIN lottery_prize b ON a.prize_id = b.id  " +
+            " lottery_act_prize a, " +
+            " lottery_prize b where  a.prize_id = b.id  " +
             " AND a.`status` = '1'  " +
             " AND b.`status` = '1'  " +
             " AND a.act_id = #{id}  " +

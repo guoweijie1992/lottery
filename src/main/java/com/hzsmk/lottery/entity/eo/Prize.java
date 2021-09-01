@@ -18,4 +18,5 @@ public class Prize {
     private String imgUrl;
     private String prizeName;
     private Long prizePrice;
+    private String useUrl;
 }

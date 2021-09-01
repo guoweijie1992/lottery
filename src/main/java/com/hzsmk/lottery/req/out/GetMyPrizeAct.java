@@ -27,14 +27,22 @@ public class GetMyPrizeAct {
     private String description;
     //中奖状态
     private String prizeStatus;
-    //是否提示中奖 y需要提示 n需要提示
+    //是否提示中奖 y需要提示 n不需要提示
     private String  ifNotice;
     //奖品价格
     private Long   prizePrice;
     //中奖券码
     private String lotteryCode;
+    //中奖券码ID
+    private Long lotteryCodeId;
 
+    //最大奖券数量
+    private Integer maxCodeCounts;
+
+    //活动结束时间
     private Date endTime;
+    //奖品名称
+    private String prizeName;
 
     //活动券码列表
     private List<String> actCodeList;

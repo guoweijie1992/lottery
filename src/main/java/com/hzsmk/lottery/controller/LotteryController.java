@@ -79,4 +79,17 @@ public class LotteryController {
     public RestResponse getMyPrize(@Valid @RequestBody GetMyPrizeIn param){
         return lotteryService.getMyPrize(param);
     }
+
+    /**
+     * 通知奖品已展示
+     */
+    /**
+     * 我的奖品
+     * @param param
+     * @return
+     */
+    @RequestMapping("lottery/notified")
+    public RestResponse notified(@Valid @RequestBody NotifiedIn param){
+        return lotteryService.notified(param);
+    }
 }

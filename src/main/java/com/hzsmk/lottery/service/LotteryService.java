@@ -21,4 +21,6 @@ public interface LotteryService {
     RestResponse help(HelpIn param);
 
     RestResponse getMyPrize(GetMyPrizeIn param);
+
+    RestResponse notified(NotifiedIn param);
 }

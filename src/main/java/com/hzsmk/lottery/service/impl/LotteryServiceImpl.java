@@ -55,7 +55,11 @@ public class LotteryServiceImpl implements LotteryService {
 
     @Override
     public RestResponse getActInfo(GetActInfoIn param) {
-        LotteryActivityEntity act = (LotteryActivityEntity) checkActStatus(param.getActId()).getResponse();
+        RestResponse restResponse = checkActStatus(param.getActId());
+        if (!ApiConsts.SUCCESS_CODE.equals(restResponse.getCode())) {
+            return restResponse;
+        }
+        LotteryActivityEntity act = (LotteryActivityEntity)restResponse.getResponse();
         //3.获取活动对应奖品
         List<Prize> prizes = actPrizeDao.selectPrizeByActId(act.getId());
         //4.组装返回参数
@@ -65,26 +69,7 @@ public class LotteryServiceImpl implements LotteryService {
         return RestResponse.successResult(getActInfoOut);
     }
 
-    private RestResponse checkActStatus(Long actId) {
-        /**
-         * 1.根据id获取活动
-         * 2.判断活动是否存在，状态是否正确
-         * 3.返回活动
-         */
-        //1.根据id获取活动
-        LotteryActivityEntity act = activityDao.selectOne(new QueryWrapper<LotteryActivityEntity>().lambda()
-                .eq(LotteryActivityEntity::getId, actId)
-                .eq(LotteryActivityEntity::getIfDelete, "0")
-                .last("limit 1 "));
-        //2.判断活动是否存在，状态是否正确
-        if (ObjectUtil.isNull(act)) {
-            return RestResponse.errorBusinessResult("活动不存在！");
-        }
-        if (!"1".equals(act.getStatus())) {
-            return RestResponse.errorBusinessResult("活动暂不可用！");
-        }
-        return RestResponse.successResult(act);
-    }
+
 
     @Override
     public RestResponse getActUserInfo(GetActUserInfoIn param) {
@@ -172,11 +157,14 @@ public class LotteryServiceImpl implements LotteryService {
         }
         //组装返回数据
         LotteryActivityEntity act = (LotteryActivityEntity) restResponse.getResponse();
+        List<Prize> prizes = actPrizeDao.selectPrizeByActId(act.getId());
         ret.put("mobile", mobile.substring(0, 3) + "****" + mobile.substring(7, 11));
         ret.put("lotteryName", act.getLotteryName());
         ret.put("endTime", act.getEndTime());
         ret.put("lotteryStatus", act.getLotteryStatus());
         ret.put("shareImgUrl", act.getShareImgUrl());
+        ret.put("subTitle",act.getSubTitle());
+        ret.put("prizeImg",prizes.get(0).getImgUrl());
         ret.put("headImgUrl", userInfo.get("headImageUrl"));
         //返回前端
         return RestResponse.successResult(ret);
@@ -284,32 +272,87 @@ public class LotteryServiceImpl implements LotteryService {
             }};
             List<LotteryActivityEntity> list = activityDao.selectActByUserId(userId, lotteryStatus);
             //循环活动列表，判断用户是否中奖
-            for (LotteryActivityEntity lotteryActivityEntity : list) {
+            for (LotteryActivityEntity actEntity : list) {
                 GetMyPrizeAct getMyPrizeAct = new GetMyPrizeAct();
-                //todo 还没做完
                 List<LotteryActCodeEntity> codeList = actCodeDao.selectList(new QueryWrapper<LotteryActCodeEntity>().lambda()
-                        .eq(LotteryActCodeEntity::getActId, lotteryActivityEntity.getId())
+                        .eq(LotteryActCodeEntity::getActId, actEntity.getId())
                         .eq(LotteryActCodeEntity::getUserId,userId)
                         .eq(LotteryActCodeEntity::getIfDelete, LotteryConsts.IFDELETE_N));
                 //按照中奖状态进行排序
                 List<LotteryActCodeEntity> collect = codeList.stream().sorted(Comparator.comparing(LotteryActCodeEntity::getPrizeStatus).reversed()).collect(Collectors.toList());
-                LotteryActCodeEntity lotteryCode = collect.get(0);
-                if(LotteryConsts.PRIZE_STATUS_WIN.equals(lotteryCode.getPrizeStatus())){
+                LotteryActCodeEntity codeEntity = collect.get(0);
+                BeanUtil.copyProperties(actEntity, getMyPrizeAct);
+                getMyPrizeAct.setLotteryId(actEntity.getId());
+                getMyPrizeAct.setPrizeStatus(codeEntity.getPrizeStatus());
+                getMyPrizeAct.setLotteryCode(codeEntity.getLotteryCode());
+                if(LotteryConsts.PRIZE_STATUS_WIN.equals(codeEntity.getPrizeStatus())){
                     //如果中奖了需要取出奖品ID，查询奖品图片
-                    LotteryPrizeEntity prize=prizeDao.selectById(lotteryCode.getPrizeId());
+                    Prize prize=prizeDao.selectByPrizeIdAndActId(codeEntity.getPrizeId(),actEntity.getId());
                     getMyPrizeAct.setPrizePrice(prize.getPrizePrice());
+                    getMyPrizeAct.setPrizeName(prize.getPrizeName());
                     getMyPrizeAct.setImgUrl(prize.getImgUrl());
+                    getMyPrizeAct.setUseUrl(prize.getUseUrl());
+                    getMyPrizeAct.setLotteryId(codeEntity.getId());
+                    //如果中奖了且未展示，需要展示活动中奖号码等字段
+                    if(LotteryConsts.IF_NOTICE_N.equals(codeEntity.getIfNotice())){
+                        getMyPrizeAct.setIfNotice(LotteryConsts.IF_NOTICE_N.equals(codeEntity.getIfNotice())?"y":"n");
+                    }
+                }else{
+                    //如果没有中奖，需要查询活动对应的奖品,取第一个
+                    List<Prize> prizes = actPrizeDao.selectPrizeByActId(actEntity.getId());
+                    getMyPrizeAct.setPrizePrice(prizes.get(0).getPrizePrice());
+                    getMyPrizeAct.setImgUrl(prizes.get(0).getImgUrl());
+                    getMyPrizeAct.setUseUrl(prizes.get(0).getUseUrl());
                 }
-
-
-
-
-
                 completedList.add(getMyPrizeAct);
             }
             getMyPrizeOut.setCompletedList(completedList);
         }
         return RestResponse.successResult(getMyPrizeOut);
+    }
+
+    /**
+     * 通知已展示
+     * @param param
+     * @return
+     */
+    @Override
+    public RestResponse notified(NotifiedIn param) {
+        LotteryActCodeEntity entity = actCodeDao.selectById(param.getLotteryCodeId());
+        entity.setIfNotice(LotteryConsts.IF_NOTICE_Y);
+        int i = actCodeDao.updateById(entity);
+        if(i>0){
+            return RestResponse.success();
+        }else{
+            return RestResponse.errorBusinessResult("保存数据失败");
+        }
+    }
+
+
+    /**
+     * 判断活动状态
+     * @param actId
+     * @return
+     */
+    private RestResponse checkActStatus(Long actId) {
+        /**
+         * 1.根据id获取活动
+         * 2.判断活动是否存在，状态是否正确
+         * 3.返回活动
+         */
+        //1.根据id获取活动
+        LotteryActivityEntity act = activityDao.selectOne(new QueryWrapper<LotteryActivityEntity>().lambda()
+                .eq(LotteryActivityEntity::getId, actId)
+                .eq(LotteryActivityEntity::getIfDelete, "0")
+                .last("limit 1 "));
+        //2.判断活动是否存在，状态是否正确
+        if (ObjectUtil.isNull(act)) {
+            return RestResponse.errorBusinessResult("活动不存在！");
+        }
+        if (!"1".equals(act.getStatus())) {
+            return RestResponse.errorBusinessResult("活动暂不可用！");
+        }
+        return RestResponse.successResult(act);
     }
 
     /**
