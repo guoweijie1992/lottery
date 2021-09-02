@@ -60,7 +60,7 @@ public class LotteryDrawJob extends QuartzJobBean {
                 LotteryActivityEntity entity = list.get(i);
                 //抽奖时间预留指定时间.获取真实的开奖时间
                 DateTime realDrawTime = DateUtil.offsetMinute(new Date(), draw_bef_min);
-                if(entity.getDrawTime().compareTo(realDrawTime)>=0){
+                if(entity.getDrawTime().compareTo(realDrawTime)<=0){
                     lotteryService.draw(entity);
                 }
             } catch (Exception e) {

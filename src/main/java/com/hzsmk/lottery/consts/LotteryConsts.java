@@ -76,5 +76,11 @@ public final class LotteryConsts {
     public static final Integer CAN_JOIN_N=0;
     public static final Integer CAN_JOIN_Y=1;
 
+    /**
+     * 中奖门槛
+     */
+    public static final String WIN_L3="L3";
+    public static final String WIN_L1="L1";
+
 
 }

@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -95,10 +97,12 @@ public class LotteryActivityEntity implements Serializable {
 	/**
 	 * 抽奖次数
 	 */
+    @JsonIgnore
 	private Integer drawCounts;
 	/**
 	 * 抽奖频次  day 天/week 星期 /around 次
 	 */
+    @JsonIgnore
 	private String drawFrequency;
 	/**
 	 * 分享页背景图
@@ -132,5 +136,14 @@ public class LotteryActivityEntity implements Serializable {
 	 * 埋点id
 	 */
 	private String businessId;
+    /**
+     * 中奖门槛
+     */
+    @JsonIgnore
+	private String winThreshold;
+    /**
+     * 背景颜色
+     */
+	private String bgColour;
 
 }

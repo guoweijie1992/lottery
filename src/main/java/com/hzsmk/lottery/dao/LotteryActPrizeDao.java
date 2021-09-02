@@ -18,11 +18,12 @@ import java.util.List;
 public interface LotteryActPrizeDao extends BaseMapper<LotteryActPrizeEntity> {
 
     @Select("SELECT " +
-            " a.level_desc, " +
+            " a.level_desc," +
             " a.amount, " +
             " a.description, " +
             " a.sort," +
             " a.use_url, " +
+            " b.id as prizeId, " +
             " b.img_url, " +
             " b.prize_name, " +
             " b.prize_price  " +

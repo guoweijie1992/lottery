@@ -12,6 +12,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Prize {
     private String levelDesc;
+    private Long prizeId;
     private Integer amount;
     private String description;
     private Integer sort;
